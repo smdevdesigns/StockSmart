@@ -30,9 +30,9 @@ const STORAGE_KEY = "inventory_items_v7";
 
 function LandingPage() {
   const [items, setItems] = useState<Item[]>([]);
-  const [loaded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [name, setName] = useState("");
-  const [max, setMax] = useState(1);
+  const [max, setMax] = useState("0");
   const [darkMode, setDarkMode] = useState(true);
   const [inventoryOpen, setInventoryOpen] = useState(true);
   const [shoppingOpen, setShoppingOpen] = useState(true);
@@ -41,15 +41,23 @@ function LandingPage() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      const savedItems = localStorage.getItem(STORAGE_KEY);
+      if (savedItems) {
+        const parsedItems: unknown = JSON.parse(savedItems);
+        if (Array.isArray(parsedItems)) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setItems(parsedItems as Item[]);
+        }
+      }
     } catch (error) {
-      console.error("Could not save inventory:", error);
+      console.error("Could not load inventory:", error);
+    } finally {
+      setLoaded(true);
     }
-  }, [items]);
+  }, []);
 
   useEffect(() => {
     if (!loaded) return;
-
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch (error) {
@@ -59,21 +67,29 @@ function LandingPage() {
 
   const addItem = () => {
     const trimmedName = name.trim();
-    if (!trimmedName || max < 1) return;
+    const maxStock = Number(max);
+    if (
+      !trimmedName ||
+      max.trim() === "" ||
+      !Number.isSafeInteger(maxStock) ||
+      maxStock < 0
+    ) {
+      return;
+    }
 
     setItems((prev) => [
       ...prev,
       {
         id: Date.now(),
         name: trimmedName,
-        max,
-        current: max,
+        max: maxStock,
+        current: maxStock,
         purchased: 0,
       },
     ]);
 
     setName("");
-    setMax(1);
+    setMax("0");
   };
 
   const consumeItem = (id: number) => {
@@ -107,9 +123,7 @@ function LandingPage() {
 
     setItems((prev) =>
       prev.map((item) =>
-        item.id === id
-          ? { ...item, purchased: item.purchased + amount }
-          : item,
+        item.id === id ? { ...item, purchased: item.purchased + amount } : item,
       ),
     );
 
@@ -160,9 +174,7 @@ function LandingPage() {
       };
     });
 
-  const fullyStocked = items.filter(
-    (item) => item.current >= item.max,
-  ).length;
+  const fullyStocked = items.filter((item) => item.current >= item.max).length;
 
   return (
     <div className={`page ${darkMode ? "dark" : "light"}`}>
@@ -252,9 +264,7 @@ function LandingPage() {
                 onChange={(e) => {
                   const value = e.target.value;
                   setName(
-                    value
-                      ? value.charAt(0).toUpperCase() + value.slice(1)
-                      : "",
+                    value ? value.charAt(0).toUpperCase() + value.slice(1) : "",
                   );
                 }}
                 onKeyDown={(e) => {
@@ -267,18 +277,16 @@ function LandingPage() {
               <label htmlFor="max-stock">Max Stock</label>
               <input
                 id="max-stock"
-                type="number"
-                min="1"
-                step="1"
+                type="text"
+                inputMode="numeric"
                 value={max}
-                onChange={(e) =>
-                  setMax(
-                    Math.max(
-                      1,
-                      Math.floor(Number(e.target.value) || 1),
-                    ),
-                  )
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  if (/^\d*$/.test(value)) {
+                    setMax(value);
+                  }
+                }}
               />
             </div>
 
@@ -291,9 +299,7 @@ function LandingPage() {
             <section className="panel">
               <button
                 className="panel-header clickable"
-                onClick={() =>
-                  setInventoryOpen((value) => !value)
-                }
+                onClick={() => setInventoryOpen((value) => !value)}
                 aria-expanded={inventoryOpen}
               >
                 <span>
@@ -344,9 +350,7 @@ function LandingPage() {
                               </span>
                             </div>
                             <span
-                              className={`stock ${
-                                isLow ? "low-stock" : ""
-                              }`}
+                              className={`stock ${isLow ? "low-stock" : ""}`}
                             >
                               {item.current} / {item.max} in stock
                             </span>
@@ -413,9 +417,7 @@ function LandingPage() {
             <section className="panel">
               <button
                 className="panel-header clickable"
-                onClick={() =>
-                  setShoppingOpen((value) => !value)
-                }
+                onClick={() => setShoppingOpen((value) => !value)}
                 aria-expanded={shoppingOpen}
               >
                 <span>
@@ -437,10 +439,7 @@ function LandingPage() {
                   {shoppingList.map((item) => {
                     const completion =
                       item.needed > 0
-                        ? Math.min(
-                            (item.purchased / item.needed) * 100,
-                            100,
-                          )
+                        ? Math.min((item.purchased / item.needed) * 100, 100)
                         : 100;
 
                     return (
@@ -514,9 +513,7 @@ function LandingPage() {
                           </button>
                           <button
                             className="complete-btn"
-                            onClick={() =>
-                              completePurchase(item.id)
-                            }
+                            onClick={() => completePurchase(item.id)}
                             disabled={item.purchased <= 0}
                           >
                             <FiCheck /> Add To Inventory
