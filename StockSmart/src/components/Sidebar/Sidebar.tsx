@@ -1,25 +1,29 @@
-import { FiPackage, FiShoppingBag, FiTrendingUp } from "react-icons/fi";
+import {
+  FiPackage,
+  FiShoppingBag,
+  FiTrendingUp,
+} from "react-icons/fi";
 import StatCard from "../StatCard/StatCard";
 
 type SidebarProps = {
   totalProducts: number;
-  itemsToShop: number;
+  shoppingCount: number;
   fullyStocked: number;
 };
 
 export default function Sidebar({
   totalProducts,
-  itemsToShop,
+  shoppingCount,
   fullyStocked,
 }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="logo">
         <div className="logo-icon">
-          <img src="/logo.png" alt="StockSmart logo" />
+          <FiPackage />
         </div>
-
-        <div className="logo-text">
+        
+        <div>
           <h1>StockSmart</h1>
           <p>Inventory Workspace</p>
         </div>
@@ -35,7 +39,7 @@ export default function Sidebar({
 
         <StatCard
           icon={<FiShoppingBag />}
-          value={itemsToShop}
+          value={shoppingCount}
           label="Need Shopping"
           color="purple"
         />

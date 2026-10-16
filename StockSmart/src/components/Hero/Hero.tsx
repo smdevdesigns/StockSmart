@@ -1,5 +1,9 @@
 
-import { FiActivity, FiMoon, FiSun } from "react-icons/fi";
+import {
+  FiActivity,
+  FiMoon,
+  FiSun,
+} from "react-icons/fi";
 
 type HeroProps = {
   darkMode: boolean;
@@ -13,17 +17,16 @@ export default function Hero({
   return (
     <section className="hero">
       <button
-        type="button"
         className="theme-toggle"
         onClick={onToggleTheme}
         aria-label="Toggle color theme"
+        type="button"
       >
         {darkMode ? <FiSun /> : <FiMoon />}
       </button>
 
       <div className="hero-badge">
-        <FiActivity />
-        LIVE INVENTORY
+        <FiActivity /> LIVE INVENTORY
       </div>
 
       <h2>

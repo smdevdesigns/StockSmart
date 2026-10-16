@@ -2,17 +2,13 @@
 import { useState } from "react";
 import {
   FiCheck,
-  FiPlus,
-  FiCornerUpLeft,
   FiChevronDown,
   FiChevronUp,
+  FiCornerUpLeft,
+  FiPlus,
 } from "react-icons/fi";
-import type { Item } from "../InventoryPanel/InventoryPanel";
 
-export type ShoppingItem = Item & {
-  needed: number;
-  remaining: number;
-};
+import type { ShoppingItem } from "../../types/inventory";
 
 type ShoppingListProps = {
   items: ShoppingItem[];
@@ -28,28 +24,38 @@ export default function ShoppingList({
   onComplete,
 }: ShoppingListProps) {
   const [isOpen, setIsOpen] = useState(true);
-  const [buyAmounts, setBuyAmounts] = useState<Record<number, string>>({});
+  const [buyAmounts, setBuyAmounts] =
+    useState<Record<number, string>>({});
 
-  const buy = (id: number) => {
-    const amount = Number(buyAmounts[id] || 1);
+  const handleBuy = (id: number) => {
+    const rawAmount = buyAmounts[id] ?? "1";
+    const amount = Number(rawAmount || 1);
 
-    if (!Number.isSafeInteger(amount) || amount < 1) return;
+    if (
+      !Number.isSafeInteger(amount) ||
+      amount <= 0
+    ) {
+      return;
+    }
 
     onBuy(id, amount);
-    setBuyAmounts((previous) => ({ ...previous, [id]: "" }));
+    setBuyAmounts((previous) => ({
+      ...previous,
+      [id]: "",
+    }));
   };
 
   return (
     <section className="panel">
       <button
-        type="button"
         className="panel-header clickable"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
+        type="button"
       >
         <span>
           <h3>Shopping List</h3>
-          <p>What is needed?k</p>
+          <p>What is needed?</p>
         </span>
         {isOpen ? <FiChevronUp /> : <FiChevronDown />}
       </button>
@@ -66,11 +72,17 @@ export default function ShoppingList({
           {items.map((item) => {
             const completion =
               item.needed > 0
-                ? Math.min((item.purchased / item.needed) * 100, 100)
+                ? Math.min(
+                    (item.purchased / item.needed) * 100,
+                    100
+                  )
                 : 100;
 
             return (
-              <div className="shopping-card" key={item.id}>
+              <div
+                className="shopping-card"
+                key={item.id}
+              >
                 <div className="shopping-top">
                   <div>
                     <h4>{item.name}</h4>
@@ -82,21 +94,20 @@ export default function ShoppingList({
                 </div>
 
                 <div className="shopping-meta">
-                  <span>Purchased: {item.purchased}</span>
-                  <span>Remaining: {item.remaining}</span>
+                  <span>
+                    Purchased: {item.purchased}
+                  </span>
+                  <span>
+                    Remaining: {item.remaining}
+                  </span>
                 </div>
 
-                <div
-                  className="progress"
-                  role="progressbar"
-                  aria-label={`${item.name} shopping progress`}
-                  aria-valuenow={Math.min(item.purchased, item.needed)}
-                  aria-valuemin={0}
-                  aria-valuemax={item.needed}
-                >
+                <div className="progress">
                   <div
                     className="shopping-fill"
-                    style={{ width: `${completion}%` }}
+                    style={{
+                      width: `${completion}%`,
+                    }}
                   />
                 </div>
 
@@ -105,24 +116,27 @@ export default function ShoppingList({
                     type="number"
                     min="1"
                     step="1"
+                    aria-label={`Quantity to buy for ${item.name}`}
                     value={buyAmounts[item.id] ?? ""}
                     placeholder="1"
-                    aria-label={`Quantity to buy for ${item.name}`}
                     onChange={(event) => {
+                      const value = event.target.value;
                       setBuyAmounts((previous) => ({
                         ...previous,
-                        [item.id]: event.target.value,
+                        [item.id]: value.replace(/\D/g, ""),
                       }));
                     }}
                     onKeyDown={(event) => {
-                      if (event.key === "Enter") buy(item.id);
+                      if (event.key === "Enter") {
+                        handleBuy(item.id);
+                      }
                     }}
                   />
 
                   <button
-                    type="button"
                     className="buy-btn"
-                    onClick={() => buy(item.id)}
+                    onClick={() => handleBuy(item.id)}
+                    type="button"
                   >
                     <FiPlus /> Buy
                   </button>
@@ -130,19 +144,19 @@ export default function ShoppingList({
 
                 <div className="shopping-actions">
                   <button
-                    type="button"
                     className="undo-btn"
                     onClick={() => onUndo(item.id)}
                     disabled={item.purchased <= 0}
+                    type="button"
                   >
                     <FiCornerUpLeft /> Undo
                   </button>
 
                   <button
-                    type="button"
                     className="complete-btn"
                     onClick={() => onComplete(item.id)}
                     disabled={item.purchased <= 0}
+                    type="button"
                   >
                     <FiCheck /> Add To Inventory
                   </button>
