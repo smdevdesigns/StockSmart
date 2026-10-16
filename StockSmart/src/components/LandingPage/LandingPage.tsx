@@ -39,13 +39,13 @@ function LandingPage() {
   const [buyAmounts, setBuyAmounts] = useState<Record<number, string>>({});
 
 
-useEffect(() => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  } catch (error) {
-    console.error("Could not save inventory:", error);
-  }
-}, [items]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch (error) {
+      console.error("Could not save inventory:", error);
+    }
+  }, [items]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -107,7 +107,9 @@ useEffect(() => {
 
     setItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, purchased: item.purchased + amount } : item,
+        item.id === id
+          ? { ...item, purchased: item.purchased + amount }
+          : item,
       ),
     );
 
@@ -158,7 +160,9 @@ useEffect(() => {
       };
     });
 
-  const fullyStocked = items.filter((item) => item.current >= item.max).length;
+  const fullyStocked = items.filter(
+    (item) => item.current >= item.max,
+  ).length;
 
   return (
     <div className={`page ${darkMode ? "dark" : "light"}`}>
@@ -248,7 +252,9 @@ useEffect(() => {
                 onChange={(e) => {
                   const value = e.target.value;
                   setName(
-                    value ? value.charAt(0).toUpperCase() + value.slice(1) : "",
+                    value
+                      ? value.charAt(0).toUpperCase() + value.slice(1)
+                      : "",
                   );
                 }}
                 onKeyDown={(e) => {
@@ -266,7 +272,12 @@ useEffect(() => {
                 step="1"
                 value={max}
                 onChange={(e) =>
-                  setMax(Math.max(1, Math.floor(Number(e.target.value) || 1)))
+                  setMax(
+                    Math.max(
+                      1,
+                      Math.floor(Number(e.target.value) || 1),
+                    ),
+                  )
                 }
               />
             </div>
@@ -280,7 +291,9 @@ useEffect(() => {
             <section className="panel">
               <button
                 className="panel-header clickable"
-                onClick={() => setInventoryOpen((value) => !value)}
+                onClick={() =>
+                  setInventoryOpen((value) => !value)
+                }
                 aria-expanded={inventoryOpen}
               >
                 <span>
@@ -331,7 +344,9 @@ useEffect(() => {
                               </span>
                             </div>
                             <span
-                              className={`stock ${isLow ? "low-stock" : ""}`}
+                              className={`stock ${
+                                isLow ? "low-stock" : ""
+                              }`}
                             >
                               {item.current} / {item.max} in stock
                             </span>
@@ -398,7 +413,9 @@ useEffect(() => {
             <section className="panel">
               <button
                 className="panel-header clickable"
-                onClick={() => setShoppingOpen((value) => !value)}
+                onClick={() =>
+                  setShoppingOpen((value) => !value)
+                }
                 aria-expanded={shoppingOpen}
               >
                 <span>
@@ -420,7 +437,10 @@ useEffect(() => {
                   {shoppingList.map((item) => {
                     const completion =
                       item.needed > 0
-                        ? Math.min((item.purchased / item.needed) * 100, 100)
+                        ? Math.min(
+                            (item.purchased / item.needed) * 100,
+                            100,
+                          )
                         : 100;
 
                     return (
@@ -494,7 +514,9 @@ useEffect(() => {
                           </button>
                           <button
                             className="complete-btn"
-                            onClick={() => completePurchase(item.id)}
+                            onClick={() =>
+                              completePurchase(item.id)
+                            }
                             disabled={item.purchased <= 0}
                           >
                             <FiCheck /> Add To Inventory
@@ -516,9 +538,22 @@ useEffect(() => {
           font-family: Inter, ui-sans-serif, system-ui, sans-serif;
         }
 
-        button, input { font: inherit; }
-        button { transition: opacity .2s, transform .2s, background .2s; }
-        button:disabled { opacity: .4; cursor: not-allowed; }
+        *, *::before, *::after {
+          box-sizing: border-box;
+        }
+
+        button, input {
+          font: inherit;
+        }
+
+        button {
+          transition: opacity .2s, transform .2s, background .2s;
+        }
+
+        button:disabled {
+          opacity: .4;
+          cursor: not-allowed;
+        }
 
         .page {
           --bg-primary: #09090f;
@@ -561,9 +596,29 @@ useEffect(() => {
           opacity: .22;
           pointer-events: none;
         }
-        .glow1 { width: 320px; height: 320px; background: var(--pink); top: -100px; left: -100px; }
-        .glow2 { width: 300px; height: 300px; background: var(--purple); top: 120px; right: -80px; }
-        .glow3 { width: 240px; height: 240px; background: var(--blue); bottom: -80px; left: 35%; }
+        .glow1 {
+          width: 320px;
+          height: 320px;
+          background: var(--pink);
+          top: -100px;
+          left: -100px;
+        }
+
+        .glow2 {
+          width: 300px;
+          height: 300px;
+          background: var(--purple);
+          top: 120px;
+          right: -80px;
+        }
+
+        .glow3 {
+          width: 240px;
+          height: 240px;
+          background: var(--blue);
+          bottom: -80px;
+          left: 35%;
+        }
 
         .app-shell {
           position: relative;
@@ -575,7 +630,9 @@ useEffect(() => {
           gap: 24px;
         }
 
-        .sidebar, .panel, .add-card {
+        .sidebar,
+        .panel,
+        .add-card {
           background: var(--card-bg);
           border: 1px solid var(--border);
           backdrop-filter: blur(20px);
@@ -587,175 +644,473 @@ useEffect(() => {
           height: fit-content;
         }
 
-        .logo { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; }
-        .logo-icon {
-          width: 62px; height: 62px; flex-shrink: 0;
-          border-radius: 20px; display: grid; place-items: center;
-          background: linear-gradient(135deg,var(--pink),var(--purple));
-          color: white; font-size: 1.5rem;
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 36px;
         }
-        .logo h1 { margin: 0; font-size: 1.35rem; }
-        .logo p { margin: 5px 0 0; color: var(--text-secondary); font-size: .85rem; }
+        .logo-icon {
+          width: 62px;
+          height: 62px;
+          flex-shrink: 0;
+          border-radius: 20px;
+          display: grid;
+          place-items: center;
+          background: linear-gradient(135deg,var(--pink),var(--purple));
+          color: white;
+          font-size: 1.5rem;
+        }
+        .logo h1 {
+          margin: 0;
+          font-size: 1.35rem;
+        }
 
-        .stats { display: flex; flex-direction: column; gap: 16px; }
+        .logo p {
+          margin: 5px 0 0;
+          color: var(--text-secondary);
+          font-size: .85rem;
+        }
+
+        .stats {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
         .stat-card {
-          background: var(--card-inner); border: 1px solid var(--border);
-          border-radius: 24px; padding: 18px;
-          display: flex; align-items: center; gap: 16px;
+          background: var(--card-inner);
+          border: 1px solid var(--border);
+          border-radius: 24px;
+          padding: 18px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
         }
         .stat-icon {
-          width: 52px; height: 52px; flex-shrink: 0; border-radius: 18px;
-          display: grid; place-items: center; color: white; font-size: 1.2rem;
+          width: 52px;
+          height: 52px;
+          flex-shrink: 0;
+          border-radius: 18px;
+          display: grid;
+          place-items: center;
+          color: white;
+          font-size: 1.2rem;
         }
-        .stat-card h3 { margin: 0; font-size: 1.5rem; }
-        .stat-card p { margin: 4px 0 0; color: var(--text-secondary); font-size: .9rem; }
-        .pink { background: linear-gradient(135deg,var(--pink),#d946ef); }
-        .purple { background: linear-gradient(135deg,var(--purple),var(--blue)); }
-        .blue { background: linear-gradient(135deg,var(--blue),#3b82f6); }
+        .stat-card h3 {
+          margin: 0;
+          font-size: 1.5rem;
+        }
+        .stat-card p {
+          margin: 4px 0 0;
+          color: var(--text-secondary);
+          font-size: .9rem;
+        }
+        .pink {
+          background: linear-gradient(135deg,var(--pink),#d946ef);
+        }
+        .purple {
+          background: linear-gradient(135deg,var(--purple),var(--blue));
+        }
+        .blue {
+          background: linear-gradient(135deg,var(--blue),#3b82f6);
+        }
 
-        .main { min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+        .main {
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
         .hero {
-          position: relative; border-radius: 32px; padding: 42px;
+          position: relative;
+          border-radius: 32px;
+          padding: 42px;
           background: linear-gradient(135deg,var(--pink),var(--purple),var(--blue));
           color: white;
         }
         .hero-badge {
-          width: fit-content; display: flex; align-items: center; gap: 8px;
-          padding: 8px 14px; border-radius: 999px;
+          width: fit-content;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 14px;
+          border-radius: 999px;
           background: rgba(255,255,255,.14);
-          border: 1px solid rgba(255,255,255,.15); font-size: .85rem;
+          border: 1px solid rgba(255,255,255,.15);
+          font-size: .85rem;
         }
-        .hero h2 { margin: 18px 0 14px; font-size: clamp(2rem,4vw,3rem); line-height: 1.1; }
-        .hero p { max-width: 650px; color: rgba(255,255,255,.9); line-height: 1.7; }
+        .hero h2 {
+          margin: 18px 0 14px;
+          font-size: clamp(2rem,4vw,3rem);
+          line-height: 1.1;
+        }
+        .hero p {
+          max-width: 650px;
+          color: rgba(255,255,255,.9);
+          line-height: 1.7;
+        }
         .theme-toggle {
-          position: absolute; top: 24px; right: 24px;
-          width: 48px; height: 48px; border-radius: 14px;
-          border: 0; background: #2b2b35; color: white;
-          display: grid; place-items: center; cursor: pointer;
+          position: absolute;
+          top: 24px;
+          right: 24px;
+          width: 48px;
+          height: 48px;
+          border-radius: 14px;
+          border: 0;
+          background: #2b2b35;
+          color: white;
+          display: grid;
+          place-items: center;
+          cursor: pointer;
         }
 
-        .mobile-summary { display: none; }
+        .mobile-summary {
+          display: none;
+        }
         .mobile-pill {
-          flex: 1; display: flex; align-items: center; justify-content: center;
-          gap: 8px; padding: 14px; border-radius: 18px;
-          background: var(--card-bg); border: 1px solid var(--border);
-          font-size: .85rem; font-weight: 600;
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 14px;
+          border-radius: 18px;
+          background: var(--card-bg);
+          border: 1px solid var(--border);
+          font-size: .85rem;
+          font-weight: 600;
         }
 
         .add-card {
-          display: flex; gap: 18px; align-items: flex-end;
-          flex-wrap: wrap; border-radius: 28px; padding: 22px;
+          display: flex;
+          gap: 20px;
+          align-items: flex-end;
+          flex-wrap: nowrap;
+          border-radius: 28px;
+          padding: 22px;
         }
-        .field { flex: 1; min-width: 180px; }
-        .field.small { max-width: 140px; }
-        .field label { display: block; margin-bottom: 10px; font-size: .9rem; }
+        .field {
+          flex: 1 1 0;
+          min-width: 0;
+        }
+
+        .field.small {
+          flex: 0 0 140px;
+          max-width: 140px;
+        }
+
+        .field label {
+          display: block;
+          margin-bottom: 10px;
+          font-size: .9rem;
+        }
         input {
-          width: 100%; min-width: 0; padding: 14px;
-          border-radius: 16px; border: 1px solid var(--border);
-          background: var(--card-inner); color: var(--text-primary);
+          display: block;
+          width: 100%;
+          min-width: 0;
+          padding: 14px;
+          border-radius: 16px;
+          border: 1px solid var(--border);
+          background: var(--card-inner);
+          color: var(--text-primary);
           outline: none;
         }
-        input:focus { border-color: var(--purple); }
-        .add-btn, .buy-btn, .shopping-actions button {
-          border: 0; border-radius: 15px; padding: 13px 18px;
-          color: white; display: flex; align-items: center;
-          justify-content: center; gap: 8px; font-weight: 600;
+        input:focus {
+          border-color: var(--purple);
+        }
+        .add-btn,
+        .buy-btn,
+        .shopping-actions button {
+          border: 0;
+          border-radius: 15px;
+          padding: 13px 18px;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-weight: 600;
           cursor: pointer;
         }
-        .add-btn { height: 52px; background: linear-gradient(135deg,var(--pink),var(--purple)); }
+        .add-btn {
+          height: 52px;
+          flex-shrink: 0;
+          white-space: nowrap;
+          background: linear-gradient(135deg,var(--pink),var(--purple));
+        }
 
-        .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; align-items: start; }
-        .panel { min-width: 0; border-radius: 28px; padding: 24px; }
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(2,minmax(0,1fr));
+          gap: 24px;
+          align-items: start;
+        }
+        .panel {
+          min-width: 0;
+          border-radius: 28px;
+          padding: 24px;
+        }
         .panel-header {
-          width: 100%; display: flex; justify-content: space-between;
-          align-items: center; gap: 12px; margin-bottom: 20px;
-          padding: 0; border: 0; text-align: left;
-          color: var(--text-primary); background: transparent;
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+          padding: 0;
+          border: 0;
+          text-align: left;
+          color: var(--text-primary);
+          background: transparent;
         }
-        .panel-header h3 { margin: 0; font-size: 1.2rem; }
-        .panel-header p { margin: 6px 0 0; color: var(--text-secondary); font-size: .9rem; }
-        .clickable { cursor: pointer; }
-        .panel-content { display: flex; flex-direction: column; gap: 18px; }
+        .panel-header h3 {
+          margin: 0;
+          font-size: 1.2rem;
+        }
+        .panel-header p {
+          margin: 6px 0 0;
+          color: var(--text-secondary);
+          font-size: .9rem;
+        }
+        .clickable {
+          cursor: pointer;
+        }
+        .panel-content {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
 
-        .inventory-card, .shopping-card {
-          min-width: 0; background: var(--card-inner);
-          border: 1px solid var(--border); border-radius: 24px; padding: 20px;
+        .inventory-card,
+        .shopping-card {
+          min-width: 0;
+          background: var(--card-inner);
+          border: 1px solid var(--border);
+          border-radius: 24px;
+          padding: 20px;
         }
-        .card-top, .shopping-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .title-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .inventory-card h4, .shopping-card h4 { margin: 0; overflow-wrap: anywhere; }
-        .stock, .shopping-card p { display: inline-block; margin: 8px 0 0; color: var(--text-secondary); font-size: .9rem; }
-        .low-stock { color: #ff5d8f; }
-        .status-pill { padding: 6px 10px; border-radius: 999px; font-size: .72rem; font-weight: 600; white-space: nowrap; }
-        .status-pill.healthy { background: rgba(34,197,94,.15); color: #22c55e; }
-        .status-pill.low { background: rgba(239,68,68,.15); color: #ef4444; }
-        .status-pill.overstock { background: rgba(168,85,247,.15); color: #c084fc; }
+        .card-top,
+        .shopping-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+        }
+        .title-row {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .inventory-card h4,
+        .shopping-card h4 {
+          margin: 0;
+          overflow-wrap: anywhere;
+        }
+        .stock,
+        .shopping-card p {
+          display: inline-block;
+          margin: 8px 0 0;
+          color: var(--text-secondary);
+          font-size: .9rem;
+        }
+        .low-stock {
+          color: #ff5d8f;
+        }
+        .status-pill {
+          padding: 6px 10px;
+          border-radius: 999px;
+          font-size: .72rem;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+        .status-pill.healthy {
+          background: rgba(34,197,94,.15);
+          color: #22c55e;
+        }
+        .status-pill.low {
+          background: rgba(239,68,68,.15);
+          color: #ef4444;
+        }
+        .status-pill.overstock {
+          background: rgba(168,85,247,.15);
+          color: #c084fc;
+        }
 
         .progress {
-          height: 10px; background: rgba(127,127,127,.15);
-          border-radius: 999px; overflow: hidden; margin: 18px 0;
+          height: 10px;
+          background: rgba(127,127,127,.15);
+          border-radius: 999px;
+          overflow: hidden;
+          margin: 18px 0;
         }
-        .progress-fill, .shopping-fill {
-          height: 100%; border-radius: inherit;
+        .progress-fill,
+        .shopping-fill {
+          height: 100%;
+          border-radius: inherit;
           background: linear-gradient(90deg,var(--pink),var(--purple),var(--blue));
         }
-        .low-fill { background: linear-gradient(90deg,#ef4444,#f97316); }
-        .overstock-fill { background: linear-gradient(90deg,#a855f7,#c084fc); }
-
-        .actions { display: flex; gap: 10px; }
-        .actions button, .delete-btn {
-          width: 44px; height: 44px; flex-shrink: 0;
-          border-radius: 14px; border: 0;
-          display: grid; place-items: center; cursor: pointer;
+        .low-fill {
+          background: linear-gradient(90deg,#ef4444,#f97316);
         }
-        .actions button { background: #2b2b35; color: white; }
-        .actions button:hover { background: #414151; }
-        .actions button.primary { background: linear-gradient(135deg,var(--pink),var(--purple)); }
-        .delete-btn { background: rgba(239,68,68,.12); color: #ef4444; }
+        .overstock-fill {
+          background: linear-gradient(90deg,#a855f7,#c084fc);
+        }
+
+        .actions {
+          display: flex;
+          gap: 10px;
+        }
+        .actions button,
+        .delete-btn {
+          width: 44px;
+          height: 44px;
+          flex-shrink: 0;
+          border-radius: 14px;
+          border: 0;
+          display: grid;
+          place-items: center;
+          cursor: pointer;
+        }
+        .actions button {
+          background: #2b2b35;
+          color: white;
+        }
+        .actions button:hover {
+          background: #414151;
+        }
+        .actions button.primary {
+          background: linear-gradient(135deg,var(--pink),var(--purple));
+        }
+        .delete-btn {
+          background: rgba(239,68,68,.12);
+          color: #ef4444;
+        }
 
         .shopping-badge {
-          flex-shrink: 0; padding: 8px 12px; border-radius: 999px;
-          background: #2b2b35; color: white; font-size: .8rem; font-weight: 600;
+          flex-shrink: 0;
+          padding: 8px 12px;
+          border-radius: 999px;
+          background: #2b2b35;
+          color: white;
+          font-size: .8rem;
+          font-weight: 600;
         }
         .shopping-meta {
-          display: flex; justify-content: space-between; gap: 10px;
-          flex-wrap: wrap; color: var(--text-secondary); font-size: .82rem;
+          display: flex;
+          justify-content: space-between;
+          gap: 10px;
+          flex-wrap: wrap;
+          color: var(--text-secondary);
+          font-size: .82rem;
           margin-top: 16px;
         }
-        .shopping-controls { display: flex; gap: 10px; margin-top: 16px; }
-        .shopping-controls input { max-width: 100px; }
-        .buy-btn { flex: 1; background: linear-gradient(135deg,var(--blue),#3b82f6); }
-        .shopping-actions { display: flex; gap: 10px; margin-top: 16px; }
-        .shopping-actions button { flex: 1; font-size: .85rem; }
-        .undo-btn { background: linear-gradient(135deg,#f59e0b,#f97316); }
-        .complete-btn { background: linear-gradient(135deg,#10b981,#22c55e); }
+        .shopping-controls {
+          display: flex;
+          gap: 10px;
+          margin-top: 16px;
+        }
+        .shopping-controls input {
+          max-width: 100px;
+        }
+        .buy-btn {
+          flex: 1;
+          background: linear-gradient(135deg,var(--blue),#3b82f6);
+        }
+        .shopping-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 16px;
+        }
+        .shopping-actions button {
+          flex: 1;
+          font-size: .85rem;
+        }
+        .undo-btn {
+          background: linear-gradient(135deg,#f59e0b,#f97316);
+        }
+        .complete-btn {
+          background: linear-gradient(135deg,#10b981,#22c55e);
+        }
 
         .empty-state {
-          padding: 45px 16px; border-radius: 24px;
-          background: var(--card-inner); border: 1px solid var(--border);
-          text-align: center; color: var(--text-secondary);
+          padding: 45px 16px;
+          border-radius: 24px;
+          background: var(--card-inner);
+          border: 1px solid var(--border);
+          text-align: center;
+          color: var(--text-secondary);
         }
-        .empty-state p { font-weight: 600; }
-        .empty-state span { font-size: .85rem; }
+        .empty-state p {
+          font-weight: 600;
+        }
+        .empty-state span {
+          font-size: .85rem;
+        }
 
         @media (max-width: 1100px) {
-          .app-shell { grid-template-columns: 1fr; }
-          .sidebar { display: none; }
-          .mobile-summary { display: flex; gap: 10px; }
+          .app-shell {
+            grid-template-columns: 1fr;
+          }
+          .sidebar {
+            display: none;
+          }
+          .mobile-summary {
+            display: flex;
+            gap: 10px;
+          }
         }
         @media (max-width: 768px) {
-          .page { padding: 16px; }
-          .grid { grid-template-columns: 1fr; }
-          .hero { padding: 30px 24px; }
-          .hero h2 { font-size: 2rem; padding-right: 12px; }
-          .theme-toggle { top: 16px; right: 16px; width: 40px; height: 40px; }
-          .panel { padding: 18px; }
-          .inventory-card, .shopping-card { padding: 16px; }
-          .shopping-actions { flex-direction: column; }
-          .mobile-pill { padding: 10px 5px; gap: 5px; font-size: .75rem; }
-          .add-card { align-items: stretch; }
-          .field, .field.small { max-width: none; min-width: 100%; }
-          .add-btn { justify-content: center; width: 100%; }
+          .page {
+            padding: 16px;
+          }
+          .grid {
+            grid-template-columns: 1fr;
+          }
+          .hero {
+            padding: 30px 24px;
+          }
+          .hero h2 {
+            font-size: 2rem;
+            padding-right: 12px;
+          }
+          .theme-toggle {
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+          }
+          .panel {
+            padding: 18px;
+          }
+          .inventory-card,
+          .shopping-card {
+            padding: 16px;
+          }
+          .shopping-actions {
+            flex-direction: column;
+          }
+          .mobile-pill {
+            padding: 10px 5px;
+            gap: 5px;
+            font-size: .75rem;
+          }
+          .add-card {
+            align-items: stretch;
+            flex-wrap: wrap;
+            gap: 16px;
+          }
+          .field,
+          .field.small {
+            flex: 1 1 100%;
+            max-width: none;
+            min-width: 100%;
+          }
+          .add-btn {
+            width: 100%;
+            justify-content: center;
+          }
         }
       `}</style>
     </div>
